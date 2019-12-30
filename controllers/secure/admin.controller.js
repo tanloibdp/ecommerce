@@ -274,7 +274,42 @@ module.exports.DeletePlaceStart = async function (req, res, next) {
     res.redirect('/admin/placeStart');
 };
 
+/* GET Booked page. */
+module.exports.getBooked = async function (req, res, next) {
+    var arrdanhmuc = ['Tên Khách Hàng', 'Tên Tour', 'Vé người lớn', 'Vé trẻ em', 'Số điện thoại', 'Thời gian đặt', 'Trạng thái', 'Thao tác'];
+    var arrTT = ['Đã Hủy', 'Đang xử lý...', 'Đã xác nhận', 'Đã Đặt'];
+    const booked = await db.booking.find().populate('_tourId _customerId').sort({ dateBook: 'descending' });
+    function DateFormat(params) {
+        var Re = `${params.getDate()}/${params.getMonth() + 1}/${params.getFullYear()} ${params.getHours()}:${params.getMinutes()}:${params.getSeconds()} `
+        return Re;
+    }
+    const doccument = {
+        user: req.body.user,
+        arrdanhmuc: arrdanhmuc,
+        arrTT: arrTT,
+        booked: booked.map(doc => {
+            return {
+                _id: doc._id,
+                displayname: doc._customerId.displayname,
+                nameTour: doc._tourId.nameTour,
+                Ntickets: doc.Ntickets,
+                NCtickets: doc.NCtickets,
+                numberPhone: doc._customerId.numberPhone,
+                dateBook: DateFormat(doc.dateBook),
+                status: doc.status,
+            };
+        }),
+    };
+    res.render('secure/booked/index', doccument);
+};
 
+/* POST Booked page. */
+module.exports.postBooked = async function (req, res, next) {
+    const booked = await db.booking.findById({ _id: req.params.bookedId });
+    booked.status = req.body.reqSelect;
+    booked.save();
+    res.redirect('/admin/booked');
+};
 
 
 

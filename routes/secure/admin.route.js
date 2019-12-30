@@ -84,4 +84,8 @@ router.post('/new/placeStart', validate.admin.postNewPlaceStart, controller.post
 
 router.get('/delete/placeStart/:placeStartId', controller.DeletePlaceStart);
 
+router.get('/booked', controller.getBooked);
+
+router.post('/booked/:bookedId', controller.postBooked);
+
 module.exports = router;
